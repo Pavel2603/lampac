@@ -23,11 +23,11 @@ if [ -n "$VERSION" ]; then
 fi
 
 ver=$(cat data/vers.txt)
-gitver=$(curl --connect-timeout 10 -k -s https://api.github.com/repos/immisterio/Lampac/releases/latest | grep tag_name | sed s/[^0-9]//g)
+gitver=$(curl --connect-timeout 10 -k -s https://api.github.com/repos/lampac-talks/lampac/releases/latest | grep tag_name | sed s/[^0-9]//g)
 if [ $gitver -gt $ver ]; then
     echo "update lampac to version $gitver"
     rm -f update.zip
-    if ! curl -L -k -o update.zip https://github.com/immisterio/Lampac/releases/latest/download/update.zip; then
+    if ! curl -L -k -o update.zip https://github.com/lampac-talks/lampac/releases/latest/download/update.zip; then
         echo "Failed to download update.zip. Exiting."
         exit 1
     fi
@@ -63,7 +63,7 @@ else
 
     mver=$(cat data/vers-minor.txt)
     dver=$(curl -k -s $BASE_URL/update/$ver.txt)
-	
+
     if [[ ${#dver} -eq 8 && $dver != $mver ]]; then
         echo "update lampac to version $gitver.$mver"
         rm -f update.zip

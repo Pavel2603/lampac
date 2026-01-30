@@ -335,7 +335,7 @@ namespace Lampac
             #endregion
 
             #region cloudflare_ips
-            ThreadPool.QueueUserWorkItem(async _ => 
+            ThreadPool.QueueUserWorkItem(async _ =>
             {
                 string ips = await Http.Get("https://www.cloudflare.com/ips-v4");
                 if (ips == null || !ips.Contains("173.245."))
@@ -371,7 +371,7 @@ namespace Lampac
             #region fix update.sh
             if (File.Exists("update.sh"))
             {
-                var olds = new string[] 
+                var olds = new string[]
                 {
                     "02a7e97392e63b7e9e35a39ce475d6f8",
                     "6354eab8b101af90cb247fc8c977dd6b",
@@ -398,9 +398,9 @@ namespace Lampac
                 {
                     if (olds.Contains(CrypTo.md5(File.ReadAllText("update.sh"))))
                     {
-                        ThreadPool.QueueUserWorkItem(async _ => 
+                        ThreadPool.QueueUserWorkItem(async _ =>
                         {
-                            string new_update = await Http.Get("https://raw.githubusercontent.com/immisterio/Lampac/refs/heads/main/update.sh");
+                            string new_update = await Http.Get("https://raw.githubusercontent.com/lampac-talks/lampac/refs/heads/main/update.sh");
                             if (new_update != null && new_update.Contains("DEST=\"/home/lampac\""))
                                 File.WriteAllText("update.sh", new_update);
                         });
@@ -424,9 +424,9 @@ namespace Lampac
             LampaCron.Run();
 
             appReload = new AppReload();
-            appReload.InkvReload = () => 
+            appReload.InkvReload = () =>
             {
-                _host.StopAsync(); 
+                _host.StopAsync();
                 AppInit.LoadModules();
             };
 

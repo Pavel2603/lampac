@@ -10,11 +10,11 @@ namespace Online.Controllers
 {
     /// <summary>
     /// Автор https://github.com/fellicienne
-    /// https://github.com/immisterio/Lampac/pull/41
+    /// https://github.com/lampac-talks/lampac/pull/41
     /// </summary>
     public class FilmixTV : BaseOnlineController<FilmixSettings>
     {
-        public FilmixTV() : base(AppInit.conf.FilmixTV) 
+        public FilmixTV() : base(AppInit.conf.FilmixTV)
         {
             loadKitInitialization = (j, i, c) =>
             {
@@ -76,7 +76,7 @@ namespace Online.Controllers
 
             if (postid == 0)
             {
-                var search = await InvokeCacheResult($"filmixtv:search:{title}:{original_title}:{clarification}:{similar}", 40, 
+                var search = await InvokeCacheResult($"filmixtv:search:{title}:{original_title}:{clarification}:{similar}", 40,
                     () => oninvk.Search(title, original_title, clarification, year, similar)
                 );
 
@@ -121,7 +121,7 @@ namespace Online.Controllers
                 }
                 else
                 {
-                    var rtk = await Http.Get<JObject>($"{init.corsHost()}/api-fx/request-token", 
+                    var rtk = await Http.Get<JObject>($"{init.corsHost()}/api-fx/request-token",
                         proxy: proxy, httpversion: init.httpversion, timeoutSeconds: 30
                     );
 
@@ -145,14 +145,14 @@ namespace Online.Controllers
                     {
                         string refreshToken = Regex.Match(F.ReadAllText(authFile), "\"refreshToken\": ?\"([^\"]+)\"").Groups[1].Value;
 
-                        root_auth = await Http.Get<JObject>($"{init.corsHost()}/api-fx/refresh?refreshToken={HttpUtility.UrlEncode(refreshToken)}", 
+                        root_auth = await Http.Get<JObject>($"{init.corsHost()}/api-fx/refresh?refreshToken={HttpUtility.UrlEncode(refreshToken)}",
                             proxy: proxy, headers: HeadersModel.Init("hash", init.hash_apitv), httpversion: init.httpversion, timeoutSeconds: 30
                         );
                     }
                     else
                     {
                         var data = new System.Net.Http.StringContent($"{{\"user_name\":\"{init.user_apitv}\",\"user_passw\":\"{init.passwd_apitv}\",\"session\":true}}", Encoding.UTF8, "application/json");
-                        root_auth = await Http.Post<JObject>($"{init.corsHost()}/api-fx/auth", data, 
+                        root_auth = await Http.Post<JObject>($"{init.corsHost()}/api-fx/auth", data,
                             proxy: proxy, headers: HeadersModel.Init("hash", init.hash_apitv), httpversion: init.httpversion, timeoutSeconds: 30
                         );
                     }

@@ -12,7 +12,7 @@ permissions:
   packages: write
 
 env:
-  IMAGE: ghcr.io/${{ github.repository }}
+  IMAGE: ghcr.io/pavel2603/lampac
 
 jobs:
   build-arch:

@@ -1,0 +1,79 @@
+name: Build & publish Docker (amd64/arm64) to GHCR
+
+on:
+  push:
+    branches: [ main ]
+  release:
+    types: [ published ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/${{ github.repository }}
+
+jobs:
+  build-arch:
+    name: Build ${{ matrix.arch }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - arch: amd64
+            platform: linux/amd64
+          - arch: arm64
+            platform: linux/arm64
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build & push arch tag
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          platforms: ${{ matrix.platform }}
+          tags: |
+            ${{ env.IMAGE }}:${{ matrix.arch }}
+
+  manifest:
+    name: Create multi-arch tags (latest + version)
+    runs-on: ubuntu-latest
+    needs: [ build-arch ]
+
+    steps:
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create multi-arch manifest for latest
+        run: |
+          docker buildx imagetools create \
+            -t "${IMAGE}:latest" \
+            "${IMAGE}:amd64" \
+            "${IMAGE}:arm64"
+
+      - name: Create multi-arch manifest for version tag (if release)
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          docker buildx imagetools create \
+            -t "${IMAGE}:${GITHUB_REF_NAME}" \
+            "${IMAGE}:amd64" \
+            "${IMAGE}:arm64"
